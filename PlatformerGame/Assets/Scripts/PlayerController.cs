@@ -40,11 +40,6 @@ public class PlayerController : MonoBehaviour
         burstAbility.Initialize(this);
     }
 
-    public void Update()
-    {
-        
-    }
-
     public void FixedUpdate()
     {
         if (dashAbility.IsActive || burstAbility.IsActive)
@@ -64,7 +59,7 @@ public class PlayerController : MonoBehaviour
 
         Gravity();
 
-        rb.linearVelocity = new Vector2(horizontalMovement * moveSpeed, rb.linearVelocity.y);
+        rb.linearVelocity = new Vector2(horizontalMovement * moveSpeed, Mathf.Max(rb.linearVelocity.y, -maxFallSpeed));
     }
 
     private void Gravity()
@@ -72,7 +67,6 @@ public class PlayerController : MonoBehaviour
         if (rb.linearVelocity.y < 0)
         {
             rb.gravityScale = baseGravity * fallSpeedMultiplier;
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -maxFallSpeed));
         }
         else
         {
