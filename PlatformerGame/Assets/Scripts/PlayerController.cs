@@ -1,15 +1,25 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private Rigidbody2D rb = null;
+    [SerializeField] public Rigidbody2D rb;
+    [SerializeField] public TrailRenderer tr;
 
-    [Header("Player Basic Movement")]
+    [Header("Ability References")]
+    [SerializeField] private PlayerDashAbility dashAbility;
+    [SerializeField] private PlayerBurstAbility burstAbility;
+
+    [Header("Player State & Movement")]
     [SerializeField] private float moveSpeed = 5.0f;
-    private float horizontalMovement;
-    private float facingDirection = 1f;
+    public float horizontalMovement { get; private set; }
+    public float facingDirection { get; private set; } = 1f;
+
+    [Header("Burst Ability")]
+    public Vector2 burstAimInput { get; private set; }
+    private bool burstKeyHeld = false;
+    [SerializeField] private float burstTriggerThreshold = 0.9f;
+    [SerializeField] private float naturalDecayThreshold = 0.5f;
 
     [Header("Jumping")]
     [SerializeField] private float jumpSpeed = 10.0f;
@@ -24,27 +34,37 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float maxFallSpeed = 18.0f;
     [SerializeField] private float fallSpeedMultiplier = 2.0f;
 
-    [Header("Dashing")]
-    private bool canDash = true;
-    private bool isDashing;
-    private float dashingPower = 24.0f;
-    private float dashingTime = 0.2f;
-    private float dashingCooldown = 1.0f;
-    [SerializeField] private TrailRenderer tr;
-
-    public void FixedUpdate()
+    void Start()
     {
-        if (isDashing)
-        {
-            return;
-        }
-        Gravity();
-        rb.linearVelocity = new Vector2(horizontalMovement * moveSpeed, rb.linearVelocity.y);
+        dashAbility.Initialize(this);
+        burstAbility.Initialize(this);
     }
 
     public void Update()
     {
-        IsGrounded();
+        
+    }
+
+    public void FixedUpdate()
+    {
+        if (dashAbility.IsActive || burstAbility.IsActive)
+        {
+            return;
+        }
+
+        bool isGrounded = IsGrounded();
+
+        if (Mathf.Abs(rb.linearVelocity.x) > naturalDecayThreshold && !isGrounded)
+        {
+            Gravity();
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -maxFallSpeed));
+
+            return;
+        }
+
+        Gravity();
+
+        rb.linearVelocity = new Vector2(horizontalMovement * moveSpeed, rb.linearVelocity.y);
     }
 
     private void Gravity()
@@ -53,23 +73,28 @@ public class PlayerController : MonoBehaviour
         {
             rb.gravityScale = baseGravity * fallSpeedMultiplier;
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -maxFallSpeed));
-        } else
+        }
+        else
         {
             rb.gravityScale = baseGravity;
         }
     }
 
+    public bool IsGrounded()
+    {
+        return Physics2D.OverlapBox(groundCheckPos.position, groundCheckSize, 0, groundLayer);
+    }
+
     public void Move(InputAction.CallbackContext value)
     {
         horizontalMovement = value.ReadValue<Vector2>().x;
-
         if (horizontalMovement != 0)
         {
             facingDirection = Mathf.Sign(horizontalMovement);
         }
     }
 
-    public void Jump(InputAction.CallbackContext value)
+    public void JumpInput(InputAction.CallbackContext value)
     {
         if (IsGrounded())
         {
@@ -77,51 +102,37 @@ public class PlayerController : MonoBehaviour
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpSpeed);
             }
-            else if (value.canceled)
+            else if (value.canceled && rb.linearVelocity.y > 0)
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.5f);
             }
         }
     }
 
-    public void Dash(InputAction.CallbackContext value)
+    public void DashInput(InputAction.CallbackContext value)
     {
-        if (value.performed && canDash)
+        if (value.performed)
         {
-            StartCoroutine(DashCoroutine());
+            dashAbility.Dash(horizontalMovement, facingDirection);
         }
     }
 
-    private IEnumerator DashCoroutine()
+    public void BurstAction(InputAction.CallbackContext value)
     {
-        canDash = false;
-        isDashing = true;
-        float originalGravity = rb.gravityScale;
-        rb.gravityScale = 0f;
+        burstAimInput = value.ReadValue<Vector2>();
 
-        float dashDirection = (horizontalMovement != 0) ? Mathf.Sign(horizontalMovement) : facingDirection;
-
-        rb.linearVelocity = new Vector2(dashDirection * dashingPower, 0f);
-        tr.emitting = true;
-
-        yield return new WaitForSeconds(dashingTime);
-
-        tr.emitting = false;
-        rb.gravityScale = originalGravity;
-        isDashing = false;
-
-        yield return new WaitForSeconds(dashingCooldown);
-
-        canDash = true;
-    }
-
-    private bool IsGrounded()
-    {
-        if (Physics2D.OverlapBox(groundCheckPos.position, groundCheckSize, 0, groundLayer))
+        if (burstAimInput.magnitude >= burstTriggerThreshold)
         {
-            return true;
+            if (!burstKeyHeld)
+            {
+                burstKeyHeld = true;
+                burstAbility.Burst(burstAimInput, facingDirection);
+            }
         }
-        return false;
+        else
+        {
+            burstKeyHeld = false;
+        }
     }
 
     private void OnDrawGizmosSelected()

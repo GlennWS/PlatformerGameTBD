@@ -576,6 +576,8 @@ GameObject:
   - component: {fileID: 1842499829}
   - component: {fileID: 1842499828}
   - component: {fileID: 1842499830}
+  - component: {fileID: 1842499832}
+  - component: {fileID: 1842499831}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -642,8 +644,8 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_LinearDamping: 1
+  m_AngularDamping: 0
   m_GravityScale: 10
   m_Material: {fileID: 6200000, guid: 9c575496c579f6d468c0f93558422f15, type: 2}
   m_IncludeLayers:
@@ -743,7 +745,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   rb: {fileID: 1842499825}
+  tr: {fileID: 1842499830}
+  dashAbility: {fileID: 1842499831}
+  burstAbility: {fileID: 1842499832}
   moveSpeed: 10
+  burstTriggerThreshold: 0.9
+  naturalDecayThreshold: 0.5
   jumpSpeed: 25
   groundCheckPos: {fileID: 688234015}
   groundCheckSize: {x: 1, y: 0.1}
@@ -753,7 +760,6 @@ MonoBehaviour:
   baseGravity: 10
   maxFallSpeed: 50
   fallSpeedMultiplier: 1.2
-  tr: {fileID: 1842499830}
 --- !u!114 &1842499829
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -839,7 +845,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1842499828}
         m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: Jump
+        m_MethodName: JumpInput
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -855,7 +861,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1842499828}
         m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
-        m_MethodName: Dash
+        m_MethodName: DashInput
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -867,6 +873,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: de215dd6-7c71-4585-8e2c-a99c7577a670
     m_ActionName: 'Player/Dash[/Keyboard/shift]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1842499828}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: BurstAction
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 23b46fc1-860d-40a7-91c1-409528d4171c
+    m_ActionName: 'Player/Burst[/Mouse/rightButton]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -991,6 +1013,42 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &1842499831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1842499823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c51a813a68cf5984ea848ebb9c52ec21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDashAbility
+  dashingPower: 24
+  dashingTime: 0.2
+  dashingCooldown: 1
+--- !u!114 &1842499832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1842499823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aeddf33943dd32d42bcf44580e790557, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerBurstAbility
+  burstForce: 20
+  burstRadius: 1.5
+  burstDamage: 10
+  burstCooldown: 0.5
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  dashBurstMultiplier: 1.5
+  maxAbilitySpeed: 25
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
