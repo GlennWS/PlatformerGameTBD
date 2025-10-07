@@ -23,9 +23,30 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private LayerMask groundLayer;
 
+    [Header("Gravity")]
+    [SerializeField]
+    private float baseGravity = 2.0f;
+    [SerializeField]
+    private float maxFallSpeed = 18.0f;
+    [SerializeField]
+    private float fallSpeedMultiplier = 2.0f;
+
     public void Update()
     {
         rb.linearVelocity = new Vector2(horizontalMovement * moveSpeed, rb.linearVelocity.y);
+        IsGrounded();
+    }
+
+    private void Gravity()
+    {
+        if (rb.linearVelocity.y < 0)
+        {
+            rb.gravityScale = baseGravity * fallSpeedMultiplier;
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -maxFallSpeed));
+        } else
+        {
+            rb.gravityScale = baseGravity;
+        }
     }
 
     public void Move(InputAction.CallbackContext value)
@@ -35,7 +56,7 @@ public class PlayerController : MonoBehaviour
 
     public void Jump(InputAction.CallbackContext value)
     {
-        if (isGrounded())
+        if (IsGrounded())
         {
             if (value.performed)
             {
@@ -48,7 +69,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private bool isGrounded()
+    private bool IsGrounded()
     {
         if (Physics2D.OverlapBox(groundCheckPos.position, groundCheckSize, 0, groundLayer))
         {
