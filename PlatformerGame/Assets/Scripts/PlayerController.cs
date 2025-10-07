@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDamageable
 {
     [SerializeField] public Rigidbody2D rb;
     [SerializeField] public TrailRenderer tr;
@@ -14,6 +14,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float moveSpeed = 5.0f;
     public float horizontalMovement { get; private set; }
     public float facingDirection { get; private set; } = 1f;
+
+    [Header("Health")]
+    [SerializeField] private float maxHealth = 100f;
+    private float currentHealth;
+    public bool IsDead { get; private set; } = false;
 
     [Header("Burst Ability")]
     public Vector2 burstAimInput { get; private set; }
@@ -36,6 +41,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        currentHealth = maxHealth;
         dashAbility.Initialize(this);
         burstAbility.Initialize(this);
     }
@@ -60,6 +66,38 @@ public class PlayerController : MonoBehaviour
         Gravity();
 
         rb.linearVelocity = new Vector2(horizontalMovement * moveSpeed, Mathf.Max(rb.linearVelocity.y, -maxFallSpeed));
+    }
+    public void TakeDamage(float damageAmount)
+    {
+        if (IsDead) return;
+
+        currentHealth -= damageAmount;
+
+        Debug.Log(gameObject.name + " took " + damageAmount + " damage. Remaining health: " + currentHealth);
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        if (IsDead) return;
+
+        IsDead = true;
+        currentHealth = 0;
+
+        this.enabled = false;
+
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            rb.bodyType = RigidbodyType2D.Kinematic;
+        }
+
+        Debug.Log(gameObject.name + " has died.");
     }
 
     private void Gravity()
@@ -90,7 +128,7 @@ public class PlayerController : MonoBehaviour
 
     public void JumpInput(InputAction.CallbackContext value)
     {
-        if (IsGrounded())
+        if (IsGrounded() && !IsDead)
         {
             if (value.performed)
             {
@@ -105,7 +143,7 @@ public class PlayerController : MonoBehaviour
 
     public void DashInput(InputAction.CallbackContext value)
     {
-        if (value.performed)
+        if (value.performed && !IsDead)
         {
             dashAbility.Dash(horizontalMovement, facingDirection);
         }
@@ -113,6 +151,8 @@ public class PlayerController : MonoBehaviour
 
     public void BurstAction(InputAction.CallbackContext value)
     {
+        if (IsDead) return;
+
         burstAimInput = value.ReadValue<Vector2>();
 
         if (burstAimInput.magnitude >= burstTriggerThreshold)
