@@ -12,6 +12,12 @@ public class PlayerDashAbility : MonoBehaviour
     private TrailRenderer tr;
     private bool canDash = true;
     public bool IsActive { get; private set; } = false;
+    [SerializeField] private bool isUnlockedField = true;
+    public bool IsUnlocked
+    {
+        get { return isUnlockedField; }
+        set { isUnlockedField = value; }
+    }
 
     public void Initialize(PlayerController pc)
     {
@@ -21,7 +27,7 @@ public class PlayerDashAbility : MonoBehaviour
 
     public void Dash(float horizontalInput, float storedFacingDirection)
     {
-        if (!canDash) return;
+        if (!canDash || !IsUnlocked) return;
         StartCoroutine(DashCoroutine(horizontalInput, storedFacingDirection));
     }
 

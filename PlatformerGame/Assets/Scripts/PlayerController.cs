@@ -26,6 +26,9 @@ public class PlayerController : MonoBehaviour, IDamageable
     [SerializeField] private float burstTriggerThreshold = 0.9f;
     [SerializeField] private float naturalDecayThreshold = 0.5f;
 
+    [Header("Wall Jump Ability")]
+    [SerializeField] private WallJumpAbility wallJumpAbility;
+
     [Header("Jumping")]
     [SerializeField] private float jumpSpeed = 10.0f;
 
@@ -35,7 +38,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     [SerializeField] private LayerMask groundLayer;
 
     [Header("Gravity")]
-    [SerializeField] private float baseGravity = 2.0f;
+    [SerializeField] public float baseGravity = 2.0f;
     [SerializeField] private float maxFallSpeed = 18.0f;
     [SerializeField] private float fallSpeedMultiplier = 2.0f;
 
@@ -44,6 +47,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         currentHealth = maxHealth;
         dashAbility.Initialize(this);
         burstAbility.Initialize(this);
+        wallJumpAbility.Initialize(this);
     }
 
     public void FixedUpdate()
@@ -53,19 +57,19 @@ public class PlayerController : MonoBehaviour, IDamageable
             return;
         }
 
+        wallJumpAbility.HandleWallLogic();
+
         bool isGrounded = IsGrounded();
-
-        if (Mathf.Abs(rb.linearVelocity.x) > naturalDecayThreshold && !isGrounded)
-        {
-            Gravity();
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -maxFallSpeed));
-
-            return;
-        }
 
         Gravity();
 
-        rb.linearVelocity = new Vector2(horizontalMovement * moveSpeed, Mathf.Max(rb.linearVelocity.y, -maxFallSpeed));
+        if (isGrounded && horizontalMovement == 0)
+        {
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        } else
+        {
+            rb.linearVelocity = new Vector2(horizontalMovement * moveSpeed, rb.linearVelocity.y);
+        }
     }
     public void TakeDamage(float damageAmount)
     {
@@ -102,6 +106,10 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void Gravity()
     {
+        if (wallJumpAbility.IsUnlocked && wallJumpAbility.isTouchingWall)
+        {
+            return;
+        }
         if (rb.linearVelocity.y < 0)
         {
             rb.gravityScale = baseGravity * fallSpeedMultiplier;
@@ -114,7 +122,19 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public bool IsGrounded()
     {
-        return Physics2D.OverlapBox(groundCheckPos.position, groundCheckSize, 0, groundLayer);
+        RaycastHit2D collisionInfo = Physics2D.BoxCast(groundCheckPos.position, groundCheckSize, 
+            0f, Vector2.down, 0.2f, groundLayer);
+
+        if (collisionInfo.collider != null)
+        {
+            float angleDot = Vector2.Dot(collisionInfo.normal, Vector2.up);
+            if (angleDot > 0.9f)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void Move(InputAction.CallbackContext value)
@@ -128,16 +148,22 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public void JumpInput(InputAction.CallbackContext value)
     {
-        if (IsGrounded() && !IsDead)
+        if (IsDead) return;
+
+        if (value.performed)
         {
-            if (value.performed)
+            if (IsGrounded())
             {
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpSpeed);
             }
-            else if (value.canceled && rb.linearVelocity.y > 0)
+            else if (wallJumpAbility.IsUnlocked && wallJumpAbility.isTouchingWall && (facingDirection == Mathf.Sign(horizontalMovement)))
             {
-                rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.5f);
+                wallJumpAbility.WallJump();
             }
+        }
+        else if (value.canceled && IsGrounded() && rb.linearVelocity.y > 0)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.5f);
         }
     }
 
@@ -167,6 +193,11 @@ public class PlayerController : MonoBehaviour, IDamageable
         {
             burstKeyHeld = false;
         }
+    }
+
+    public void FlipFacingDirection()
+    {
+        facingDirection *= -1;
     }
 
     private void OnDrawGizmosSelected()

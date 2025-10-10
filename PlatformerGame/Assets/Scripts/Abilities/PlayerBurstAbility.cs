@@ -18,6 +18,12 @@ public class PlayerBurstAbility : MonoBehaviour
     private PlayerDashAbility dashAbility;
     private bool canBurst = true;
     public bool IsActive { get; private set; } = false;
+    [SerializeField] private bool isUnlockedField = true;
+    public bool IsUnlocked
+    {
+        get { return isUnlockedField; }
+        set { isUnlockedField = value; }
+    }
 
     public void Initialize(PlayerController pc)
     {
@@ -27,7 +33,7 @@ public class PlayerBurstAbility : MonoBehaviour
 
     public void Burst(Vector2 aimDirection, float storedFacingDirection)
     {
-        if (!canBurst) return;
+        if (!canBurst || !IsUnlocked) return;
 
         Vector2 burstDirection;
 
