@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4c7328441bceff42acfc0294710423b, type: 3}
+  m_Name: Level1_MusicProgression
+  m_EditorClassIdentifier: Assembly-CSharp::MusicProgression
+  fullTrack: {fileID: 8300000, guid: 0d69f00013385dd48b9154921bb96fdb, type: 3}
+  stems:
+  - startTime: 0
+    endTime: 3.4
+  - startTime: 7
+    endTime: 19
+  - startTime: 20
+    endTime: 61
+  - startTime: 62
+    endTime: 75
+  - startTime: 76
+    endTime: 88
+  - startTime: 89
+    endTime: 130
+  - startTime: 131
+    endTime: 137
+  - startTime: 138
+    endTime: 151
+  - startTime: 152
+    endTime: 164
+  - startTime: 165
+    endTime: 192
+  - startTime: 193
+    endTime: 220
+  - startTime: 165
+    endTime: 193
+  fadeDuration: 0.1

@@ -42,6 +42,19 @@ public class PlayerController : MonoBehaviour, IDamageable
     [SerializeField] private float maxFallSpeed = 18.0f;
     [SerializeField] private float fallSpeedMultiplier = 2.0f;
 
+    private void Awake()
+    {
+        PlayerController[] players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+
+        if (players.Length > 1)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        DontDestroyOnLoad(gameObject);
+    }
+
     void Start()
     {
         currentHealth = maxHealth;
