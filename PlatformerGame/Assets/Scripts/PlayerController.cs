@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     [Header("Ability References")]
     [SerializeField] private PlayerDashAbility dashAbility;
     [SerializeField] private PlayerBurstAbility burstAbility;
+    [SerializeField] private PlayerGlideAbility glideAbility;
 
     [Header("Player State & Movement")]
     [SerializeField] private float moveSpeed = 5.0f;
@@ -119,6 +120,10 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void Gravity()
     {
+        if (glideAbility != null && glideAbility.IsActive)
+        {
+            return;
+        }
         if (wallJumpAbility.IsUnlocked && wallJumpAbility.isTouchingWall)
         {
             return;
@@ -205,6 +210,23 @@ public class PlayerController : MonoBehaviour, IDamageable
         else
         {
             burstKeyHeld = false;
+        }
+    }
+
+    public void GlideInput(InputAction.CallbackContext value)
+    {
+        if (IsDead || !glideAbility.IsUnlocked) return;
+
+        bool canGlide = !IsGrounded();
+        bool abilityActive = dashAbility.IsActive || burstAbility.IsActive;
+
+        if (value.performed && canGlide && !abilityActive)
+        {
+            glideAbility.StartGlide();
+        }
+        else if (value.canceled || IsGrounded() || abilityActive)
+        {
+            glideAbility.StopGlide();
         }
     }
 
