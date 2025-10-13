@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     [SerializeField] private float maxHealth = 100f;
     private float currentHealth;
     public bool IsDead { get; private set; } = false;
+    public bool IsAirbourne { get; private set; } = false;
 
     [Header("Burst Ability")]
     public Vector2 burstAimInput { get; private set; }
@@ -79,9 +80,16 @@ public class PlayerController : MonoBehaviour, IDamageable
 
         if (isGrounded && horizontalMovement == 0)
         {
+            if (IsAirbourne)
+            {
+                IsAirbourne = false;
+                dashAbility.ResetAirUse();
+                burstAbility.ResetAirUse();
+            }
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
         } else
         {
+            IsAirbourne = true;
             rb.linearVelocity = new Vector2(horizontalMovement * moveSpeed, rb.linearVelocity.y);
         }
     }
@@ -217,14 +225,15 @@ public class PlayerController : MonoBehaviour, IDamageable
     {
         if (IsDead || !glideAbility.IsUnlocked) return;
 
-        bool canGlide = !IsGrounded();
+        bool isTouchingWall = wallJumpAbility.isTouchingWall;
+        bool canStartGlide = !IsGrounded() && !isTouchingWall;
         bool abilityActive = dashAbility.IsActive || burstAbility.IsActive;
 
-        if (value.performed && canGlide && !abilityActive)
+        if (value.performed && canStartGlide && !abilityActive)
         {
             glideAbility.StartGlide();
         }
-        else if (value.canceled || IsGrounded() || abilityActive)
+        else if (value.canceled || IsGrounded() || abilityActive || isTouchingWall)
         {
             glideAbility.StopGlide();
         }

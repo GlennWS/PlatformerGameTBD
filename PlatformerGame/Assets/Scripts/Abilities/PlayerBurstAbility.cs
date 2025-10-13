@@ -17,6 +17,7 @@ public class PlayerBurstAbility : MonoBehaviour
     private Rigidbody2D rb;
     private PlayerDashAbility dashAbility;
     private bool canBurst = true;
+    private bool usedInAir = false;
     public bool IsActive { get; private set; } = false;
     [SerializeField] private bool isUnlockedField = true;
     public bool IsUnlocked
@@ -33,7 +34,7 @@ public class PlayerBurstAbility : MonoBehaviour
 
     public void Burst(Vector2 aimDirection, float storedFacingDirection)
     {
-        if (!canBurst || !IsUnlocked) return;
+        if (!canBurst || !IsUnlocked || usedInAir) return;
 
         Vector2 burstDirection;
 
@@ -41,6 +42,7 @@ public class PlayerBurstAbility : MonoBehaviour
         {
             burstDirection = aimDirection.normalized;
             burstDirection = new Vector2(Mathf.Round(burstDirection.x), Mathf.Round(burstDirection.y));
+            usedInAir = true;
         }
         else
         {
@@ -93,5 +95,10 @@ public class PlayerBurstAbility : MonoBehaviour
         {
             Debug.Log("Player Burst hit: " + target.name);
         }
+    }
+
+    public void ResetAirUse()
+    {
+        usedInAir = false;
     }
 }

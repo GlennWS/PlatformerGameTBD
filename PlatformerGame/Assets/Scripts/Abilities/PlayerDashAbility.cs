@@ -11,6 +11,7 @@ public class PlayerDashAbility : MonoBehaviour
     private Rigidbody2D rb;
     private TrailRenderer tr;
     private bool canDash = true;
+    private bool usedInAir = false;
     public bool IsActive { get; private set; } = false;
     [SerializeField] private bool isUnlockedField = true;
     public bool IsUnlocked
@@ -27,7 +28,8 @@ public class PlayerDashAbility : MonoBehaviour
 
     public void Dash(float horizontalInput, float storedFacingDirection)
     {
-        if (!canDash || !IsUnlocked) return;
+        if (!canDash || !IsUnlocked || usedInAir) return;
+        usedInAir = true;
         StartCoroutine(DashCoroutine(horizontalInput, storedFacingDirection));
     }
 
@@ -51,6 +53,12 @@ public class PlayerDashAbility : MonoBehaviour
         IsActive = false;
 
         yield return new WaitForSeconds(dashingCooldown);
+        canDash = true;
+    }
+
+    public void ResetAirUse()
+    {
+        usedInAir = false;
         canDash = true;
     }
 }
