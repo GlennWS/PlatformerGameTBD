@@ -10,9 +10,11 @@ public class PlayerController : MonoBehaviour, IDamageable
     [SerializeField] private PlayerDashAbility dashAbility;
     [SerializeField] private PlayerBurstAbility burstAbility;
     [SerializeField] private PlayerGlideAbility glideAbility;
+    [SerializeField] private PlayerRollAbility rollAbility;
 
     [Header("Player State & Movement")]
     [SerializeField] private float moveSpeed = 5.0f;
+    [SerializeField] private BoxCollider2D playerCollider;
     public float horizontalMovement { get; private set; }
     public float facingDirection { get; private set; } = 1f;
 
@@ -29,7 +31,11 @@ public class PlayerController : MonoBehaviour, IDamageable
     [SerializeField] private float naturalDecayThreshold = 0.5f;
 
     [Header("Wall Jump Ability")]
+    public bool IsBoosted { get; private set; } = false;
     [SerializeField] private WallJumpAbility wallJumpAbility;
+
+    [Header("Roll Ability")]
+    [SerializeField] private float boostedVelocityDecayFactor = 0.9f;
 
     [Header("Jumping")]
     [SerializeField] private float jumpSpeed = 10.0f;
@@ -63,11 +69,12 @@ public class PlayerController : MonoBehaviour, IDamageable
         dashAbility.Initialize(this);
         burstAbility.Initialize(this);
         wallJumpAbility.Initialize(this);
+        rollAbility.Initialize(this, playerCollider);
     }
 
     public void FixedUpdate()
     {
-        if (dashAbility.IsActive || burstAbility.IsActive)
+        if (dashAbility.IsActive || burstAbility.IsActive || rollAbility.IsActive)
         {
             return;
         }
@@ -76,9 +83,7 @@ public class PlayerController : MonoBehaviour, IDamageable
 
         bool isGrounded = IsGrounded();
 
-        Gravity();
-
-        if (isGrounded && horizontalMovement == 0)
+        if (isGrounded)
         {
             if (IsAirbourne)
             {
@@ -86,13 +91,44 @@ public class PlayerController : MonoBehaviour, IDamageable
                 dashAbility.ResetAirUse();
                 burstAbility.ResetAirUse();
             }
-            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
-        } else
+        }
+        else
         {
             IsAirbourne = true;
-            rb.linearVelocity = new Vector2(horizontalMovement * moveSpeed, rb.linearVelocity.y);
         }
+
+        Vector2 currentVelocity = rb.linearVelocity;
+        float targetSpeed = horizontalMovement * moveSpeed;
+        float newVelocityX = currentVelocity.x;
+
+        if (IsBoosted)
+        {
+            newVelocityX *= boostedVelocityDecayFactor;
+
+            if (isGrounded ||
+                Mathf.Abs(newVelocityX) < moveSpeed ||
+                (horizontalMovement != 0 && Mathf.Sign(horizontalMovement) != Mathf.Sign(newVelocityX)))
+            {
+                IsBoosted = false;
+            }
+        }
+
+        if (!IsBoosted)
+        {
+            if (horizontalMovement != 0)
+            {
+                newVelocityX = targetSpeed;
+            }
+            else if (isGrounded)
+            {
+                newVelocityX = 0f;
+            }
+        }
+
+        Gravity();
+        rb.linearVelocity = new Vector2(newVelocityX, currentVelocity.y);
     }
+
     public void TakeDamage(float damageAmount)
     {
         if (IsDead) return;
@@ -176,11 +212,26 @@ public class PlayerController : MonoBehaviour, IDamageable
     {
         if (IsDead) return;
 
+        if (rollAbility.IsActive) return;
+
         if (value.performed)
         {
             if (IsGrounded())
             {
-                rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpSpeed);
+                var boost = rollAbility.ConsumeJumpBoost();
+                float verticalBoost = boost.verticalMultiplier;
+                float horizontalForce = boost.horizontalForce;
+
+                float newHorizontalVelocity = rb.linearVelocity.x + (facingDirection * horizontalForce);
+                rb.linearVelocity = new Vector2(
+                    newHorizontalVelocity,
+                    jumpSpeed * verticalBoost
+                );
+
+                if (horizontalForce > 0.01f)
+                {
+                    IsBoosted = true;
+                }
             }
             else if (wallJumpAbility.IsUnlocked && wallJumpAbility.isTouchingWall && (facingDirection == Mathf.Sign(horizontalMovement)))
             {
@@ -239,9 +290,32 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
     }
 
+    public void RollInput(InputAction.CallbackContext value)
+    {
+        if (IsDead || !rollAbility.IsUnlocked) return;
+
+        if (value.performed)
+        {
+            if (IsGrounded())
+            {
+                rollAbility.Roll();
+            }
+        }
+    }
+
     public void FlipFacingDirection()
     {
         facingDirection *= -1;
+    }
+
+    public bool IsClearAbove(float heightCheck)
+    {
+        return !Physics2D.Raycast(
+            playerCollider.bounds.center,
+            Vector2.up,
+            heightCheck,
+            groundLayer
+        );
     }
 
     private void OnDrawGizmosSelected()
