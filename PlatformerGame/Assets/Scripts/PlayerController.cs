@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour, IDamageable
 {
     [SerializeField] public Rigidbody2D rb;
     [SerializeField] public TrailRenderer tr;
+    public NPCInteraction currentInteractable { get; set; }
 
     [Header("Ability References")]
     [SerializeField] private PlayerDashAbility dashAbility;
@@ -201,6 +202,12 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public void Move(InputAction.CallbackContext value)
     {
+        if (DialogueManager.Instance.IsDialogueActive)
+        {
+            horizontalMovement = 0f;
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            return;
+        }
         horizontalMovement = value.ReadValue<Vector2>().x;
         if (horizontalMovement != 0)
         {
@@ -299,6 +306,19 @@ public class PlayerController : MonoBehaviour, IDamageable
             if (IsGrounded())
             {
                 rollAbility.Roll();
+            }
+        }
+    }
+
+    public void InteractInput(InputAction.CallbackContext value)
+    {
+        if (IsDead || !value.performed) return;
+
+        if (currentInteractable != null)
+        {
+            if (!DialogueManager.Instance.IsDialogueActive)
+            {
+                currentInteractable.StartInteraction();
             }
         }
     }
