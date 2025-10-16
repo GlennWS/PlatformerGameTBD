@@ -17,6 +17,7 @@ public class AudioManager : MonoBehaviour
     private float currentStemStartTime = 0f;
     private float currentStemEndTime = 0f;
     private bool isFading = false;
+    private bool advancing = false;
 
     private void Awake()
     {
@@ -39,6 +40,10 @@ public class AudioManager : MonoBehaviour
 
         if (activeSource.time >= currentStemEndTime)
         {
+            if (advancing)
+            {
+                AdvanceStem();
+            }
             activeSource.time = currentStemStartTime;
         }
     }
@@ -75,6 +80,12 @@ public class AudioManager : MonoBehaviour
     {
         if (isFading) return;
 
+        if (!advancing)
+        {
+            advancing = true;
+            return;
+        }
+
         int nextStemIndex = currentStemIndex + 1;
         if (nextStemIndex >= currentProgression.stems.Count)
         {
@@ -90,15 +101,7 @@ public class AudioManager : MonoBehaviour
 
         newSource.time = currentStemStartTime;
         newSource.volume = targetVolume;
-
-        StartCoroutine(CrossFadeRoutine(oldSource, newSource));
-    }
-
-    private IEnumerator CrossFadeRoutine(AudioSource oldSource, AudioSource newSource)
-    {
-        isFading = true;
         oldSource.volume = 0f;
-        yield return null;
-        isFading = false;
+        advancing = false;
     }
 }
