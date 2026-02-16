@@ -53,12 +53,19 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void Awake()
     {
+        rb = GetComponent<Rigidbody2D>();
+
         PlayerController[] players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
 
         if (players.Length > 1)
         {
             Destroy(gameObject);
             return;
+        }
+
+        foreach (var ability in GetComponents<PlayerAbility>())
+        {
+            ability.Initialize(this);
         }
 
         DontDestroyOnLoad(gameObject);

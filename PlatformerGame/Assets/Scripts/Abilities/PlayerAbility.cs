@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerAbility
+public class PlayerAbility : MonoBehaviour
 {
     protected PlayerController pc;
     protected Rigidbody2D rb;

@@ -1,11 +1,7 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
-public class WallJumpAbility : MonoBehaviour
+public class WallJumpAbility : PlayerAbility
 {
-    private PlayerController controller;
-    private Rigidbody2D rb;
-
     [Header("Wall Detection")]
     [SerializeField] private float wallCheckDistance = 0.5f;
     [SerializeField] private LayerMask wallLayer;
@@ -16,51 +12,51 @@ public class WallJumpAbility : MonoBehaviour
     [SerializeField] private float wallJumpForceY = 12f;
     [SerializeField] private float wallSlideSpeed = 2f;
 
-    public bool IsUnlocked { get; set; } = true;
+    private Collider2D playerCollider;
 
-    public void Initialize(PlayerController pc)
+    public override void Initialize(PlayerController playerController)
     {
-        controller = pc;
-        rb = pc.rb;
+        base.Initialize(playerController);
+        playerCollider = playerController.GetComponent<Collider2D>();
     }
 
     public void HandleWallLogic()
     {
-        if (!IsUnlocked || controller.IsDead)
+        if (!IsUnlocked || pc.IsDead)
         {
             return;
         }
 
         CheckWall();
 
-        bool isPressingIntoWall = (controller.facingDirection == Mathf.Sign(controller.horizontalMovement));
+        bool isPressingIntoWall = (pc.facingDirection == Mathf.Sign(pc.horizontalMovement));
 
-        if (isTouchingWall && !controller.IsGrounded() && rb.linearVelocity.y < 0 && isPressingIntoWall)
+        if (isTouchingWall && !pc.IsGrounded() && rb.linearVelocity.y < 0 && isPressingIntoWall)
         {
             float newYVelocity = Mathf.Max(rb.linearVelocity.y, -wallSlideSpeed);
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, newYVelocity);
 
-            rb.gravityScale = controller.baseGravity;
+            RestoreGravity();
         }
     }
 
     public void WallJump()
     {
-        bool isPressingIntoWall = (controller.facingDirection == Mathf.Sign(controller.horizontalMovement));
+        bool isPressingIntoWall = (pc.facingDirection == Mathf.Sign(pc.horizontalMovement));
 
         if (!IsUnlocked || !isPressingIntoWall) return;
 
-        controller.FlipFacingDirection();
+        pc.FlipFacingDirection();
 
-        float horizontalForce = controller.facingDirection * wallJumpForceX;
+        float horizontalForce = pc.facingDirection * wallJumpForceX;
         rb.linearVelocity = new Vector2(horizontalForce, wallJumpForceY);
-        rb.gravityScale = controller.baseGravity;
+        RestoreGravity();
     }
 
     private void CheckWall()
     {
-        Vector2 playerSize = controller.GetComponent<Collider2D>().bounds.size;
-        Vector2 castDirection = new Vector2(controller.facingDirection, 0);
+        Vector2 playerSize = playerCollider.bounds.size;
+        Vector2 castDirection = new Vector2(pc.facingDirection, 0);
         Vector2 castOrigin = (Vector2)rb.position + castDirection * (playerSize.x / 2f);
         Vector2 castBoxSize = new Vector2(0.05f, playerSize.y * 0.9f);
 
