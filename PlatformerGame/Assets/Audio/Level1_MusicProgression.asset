@@ -18,4 +18,12 @@ MonoBehaviour:
     endTime: 8
   - startTime: 16
     endTime: 32
+  - startTime: 32
+    endTime: 48
+  - startTime: 48
+    endTime: 80
+  - startTime: 80
+    endTime: 128
+  - startTime: 128
+    endTime: 144
   fadeDuration: 0.1

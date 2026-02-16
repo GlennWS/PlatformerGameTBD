@@ -796,6 +796,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Hazard
   damageAmount: 25
+  damageInterval: 1
   destroyOnHit: 0
 --- !u!60 &1708357519
 PolygonCollider2D:
