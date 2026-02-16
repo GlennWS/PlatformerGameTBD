@@ -77,7 +77,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         dashAbility.Initialize(this);
         burstAbility.Initialize(this);
         wallJumpAbility.Initialize(this);
-        rollAbility.Initialize(this, playerCollider);
+        rollAbility.Initialize(this);
     }
 
     public void FixedUpdate()

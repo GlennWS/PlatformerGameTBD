@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class PlayerRollAbility : MonoBehaviour
+public class PlayerRollAbility : PlayerAbility
 {
     [Header("Roll Parameters")]
     [SerializeField] private float rollDuration = 0.4f;
@@ -17,31 +17,19 @@ public class PlayerRollAbility : MonoBehaviour
     [SerializeField] private float boostedJumpHorizontalForce = 5.0f;
     [SerializeField] private float jumpBoostWindow = 0.15f;
 
-    private Rigidbody2D rb;
     private BoxCollider2D coll;
-    private PlayerController pc;
-
     private Vector2 originalColliderSize;
     private Vector2 originalColliderOffset;
 
     private bool canRoll = true;
     private bool shouldBoostNextJump = false;
 
-    public bool IsActive { get; private set; } = false;
+    private Coroutine boostWindowCoroutine;
 
-    [SerializeField] private bool isUnlockedField = true;
-    public bool IsUnlocked
+    public override void Initialize(PlayerController playerController)
     {
-        get { return isUnlockedField; }
-        set { isUnlockedField = value; }
-    }
-
-    public void Initialize(PlayerController controller, BoxCollider2D playerCollider)
-    {
-        pc = controller;
-        rb = controller.rb;
-        coll = playerCollider;
-
+        base.Initialize(playerController);
+        coll = playerController.GetComponent<BoxCollider2D>();
         originalColliderSize = coll.size;
         originalColliderOffset = coll.offset;
     }
@@ -50,8 +38,7 @@ public class PlayerRollAbility : MonoBehaviour
     {
         if (!canRoll || IsActive || !IsUnlocked) return;
 
-        StopAllCoroutines();
-
+        CancelBoostWindow();
         StartCoroutine(RollCoroutine());
     }
 
@@ -61,7 +48,6 @@ public class PlayerRollAbility : MonoBehaviour
         IsActive = true;
 
         float rollDirection = pc.facingDirection;
-        float originalGravity = rb.gravityScale;
 
         rb.linearVelocity = new Vector2(rollDirection * rollSpeed, rb.linearVelocity.y);
         rb.gravityScale = 0f;
@@ -72,7 +58,7 @@ public class PlayerRollAbility : MonoBehaviour
         yield return new WaitForSeconds(rollDuration);
 
         IsActive = false;
-        rb.gravityScale = originalGravity;
+        RestoreGravity();
 
         float clearanceNeeded = originalColliderSize.y - rolledHeight;
 
@@ -84,7 +70,7 @@ public class PlayerRollAbility : MonoBehaviour
         coll.size = originalColliderSize;
         coll.offset = originalColliderOffset;
 
-        StartCoroutine(BoostWindowCoroutine());
+        boostWindowCoroutine = StartCoroutine(BoostWindowCoroutine());
 
         yield return new WaitForSeconds(rollCooldown);
         canRoll = true;
@@ -97,6 +83,7 @@ public class PlayerRollAbility : MonoBehaviour
         yield return new WaitForSeconds(jumpBoostWindow);
 
         shouldBoostNextJump = false;
+        boostWindowCoroutine = null;
     }
 
     public (float verticalMultiplier, float horizontalForce) ConsumeJumpBoost()
@@ -104,10 +91,20 @@ public class PlayerRollAbility : MonoBehaviour
         if (shouldBoostNextJump)
         {
             shouldBoostNextJump = false;
-            StopCoroutine(BoostWindowCoroutine());
+            CancelBoostWindow();
 
             return (boostedJumpMultiplier, boostedJumpHorizontalForce);
         }
         return (1.0f, 0.0f);
+    }
+
+    public void CancelBoostWindow()
+    {
+        if (boostWindowCoroutine != null)
+        {
+            StopCoroutine(boostWindowCoroutine);
+            boostWindowCoroutine = null;
+        }
+        shouldBoostNextJump = false;
     }
 }
