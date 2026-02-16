@@ -98,7 +98,7 @@ public class PlayerRollAbility : PlayerAbility
         return (1.0f, 0.0f);
     }
 
-    public void CancelBoostWindow()
+    private void CancelBoostWindow()
     {
         if (boostWindowCoroutine != null)
         {

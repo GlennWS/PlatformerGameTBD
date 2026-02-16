@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class PlayerBurstAbility : MonoBehaviour
+public class PlayerBurstAbility : PlayerAbility
 {
     [Header("Burst Parameters")]
     [SerializeField] private float burstForce = 20f;
@@ -14,21 +14,13 @@ public class PlayerBurstAbility : MonoBehaviour
     [SerializeField] private float dashBurstMultiplier = 1.5f;
     [SerializeField] private float maxAbilitySpeed = 25f;
 
-    private Rigidbody2D rb;
     private PlayerDashAbility dashAbility;
     private bool canBurst = true;
     private bool usedInAir = false;
-    public bool IsActive { get; private set; } = false;
-    [SerializeField] private bool isUnlockedField = true;
-    public bool IsUnlocked
-    {
-        get { return isUnlockedField; }
-        set { isUnlockedField = value; }
-    }
 
-    public void Initialize(PlayerController pc)
+    public override void Initialize(PlayerController playerController)
     {
-        rb = pc.rb;
+        base.Initialize(playerController);
         dashAbility = pc.GetComponent<PlayerDashAbility>();
     }
 
@@ -36,13 +28,13 @@ public class PlayerBurstAbility : MonoBehaviour
     {
         if (!canBurst || !IsUnlocked || usedInAir) return;
 
+        usedInAir = true;
         Vector2 burstDirection;
 
         if (aimDirection.magnitude > 0.1f)
         {
             burstDirection = aimDirection.normalized;
             burstDirection = new Vector2(Mathf.Round(burstDirection.x), Mathf.Round(burstDirection.y));
-            usedInAir = true;
         }
         else
         {
@@ -60,12 +52,9 @@ public class PlayerBurstAbility : MonoBehaviour
         Vector2 baseForce = -direction * burstForce;
         Vector2 finalVelocity;
 
-        float boostAmount = 1f;
-
         if (dashAbility != null && dashAbility.IsActive)
         {
-            boostAmount = dashBurstMultiplier;
-            finalVelocity = rb.linearVelocity + baseForce * boostAmount;
+            finalVelocity = rb.linearVelocity + baseForce * dashBurstMultiplier;
         }
         else
         {
