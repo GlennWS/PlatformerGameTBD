@@ -322,7 +322,7 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private bool CanAct()
     {
-        return !IsDead && !DialogueManager.Instance.IsDialogueActive;
+        return !IsDead && (DialogueManager.Instance == null || !DialogueManager.Instance.IsDialogueActive);
     }
 
     public void FlipFacingDirection()

@@ -11,6 +11,7 @@ public class DialogueLine
 
     [TextArea(3, 5)]
     public string dialogueText;
+    public string nextLineID;
 }
 
 [Serializable]

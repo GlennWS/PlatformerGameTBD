@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,12 +22,11 @@ public class DialogueManager : MonoBehaviour
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
-        else
-        {
-            Instance = this;
-            dialoguePanel.SetActive(false);
-        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        dialoguePanel.SetActive(false);
     }
 
     public void StartDialogue(DialogueLine[] dialogueLines)

@@ -4,8 +4,10 @@ public class CameraController : MonoBehaviour
 {
     [Header("Target & Speed")]
     private Transform target;
-    [SerializeField] private float smoothSpeed = 0.125f;
+    [SerializeField] private float smoothSpeed = 0.15f;
     [SerializeField] private Vector3 offset = new Vector3(0f, 2f, -10f);
+
+    private Vector3 currentVelocity;
 
     private void Awake()
     {
@@ -21,31 +23,24 @@ public class CameraController : MonoBehaviour
 
     void LateUpdate()
     {
-        if (target == null)
-        {
-            Debug.LogError("Camera target not set.");
-            return;
-        }
+        if (target == null) return;
 
         Vector3 desiredPosition = target.position + offset;
-        Vector3 smoothedPosition = Vector3.Lerp(
+        transform.position = Vector3.SmoothDamp(
             transform.position,
             desiredPosition,
-            smoothSpeed * Time.deltaTime * 50f
+            ref currentVelocity,
+            smoothSpeed
         );
-
-        transform.position = smoothedPosition;
     }
 
     public void SetTarget(Transform newTarget)
     {
         target = newTarget;
 
-        if (target != null)
-        {
-            Vector3 desiredPosition = target.position;
-            desiredPosition.z = transform.position.z;
-            transform.position = desiredPosition;
-        }
+        if (target == null) return;
+
+        transform.position = target.position + offset;
+        currentVelocity = Vector3.zero;
     }
 }

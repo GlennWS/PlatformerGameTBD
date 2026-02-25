@@ -247,6 +247,7 @@ BoxCollider2D:
   m_EdgeRadius: 0
 --- !u!212 &492716393
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -292,6 +293,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 2537882373423050008, guid: d69084506edbdf045a68c52e12ab93f4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -301,7 +303,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &492716394
 Transform:
@@ -384,6 +385,7 @@ BoxCollider2D:
   m_EdgeRadius: 0
 --- !u!212 &517761472
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -429,6 +431,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 2537882373423050008, guid: d69084506edbdf045a68c52e12ab93f4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -438,7 +441,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &517761473
 Transform:
@@ -702,6 +704,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -809,6 +812,7 @@ BoxCollider2D:
   m_EdgeRadius: 0
 --- !u!212 &670671659
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -854,6 +858,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 2537882373423050008, guid: d69084506edbdf045a68c52e12ab93f4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -863,7 +868,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &670671660
 Transform:
@@ -1384,6 +1388,7 @@ Rigidbody2D:
   m_Constraints: 7
 --- !u!212 &841182297
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1429,6 +1434,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: -5159362228428509745, guid: 4f9a03991060d254d881edf91a33a72d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -1438,7 +1444,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &841182298
 Transform:
@@ -1597,6 +1602,7 @@ BoxCollider2D:
   m_EdgeRadius: 0
 --- !u!212 &938358975
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1642,6 +1648,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 2537882373423050008, guid: d69084506edbdf045a68c52e12ab93f4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -1651,7 +1658,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &938358976
 Transform:
@@ -1763,6 +1769,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -1825,6 +1832,7 @@ GameObject:
   m_IsActive: 1
 --- !u!212 &1269536031
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1870,6 +1878,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 2720515350269872950, guid: 007465b960113db46a65efa73305552e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -1879,7 +1888,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!61 &1269536032
 BoxCollider2D:
@@ -2146,6 +2154,7 @@ BoxCollider2D:
   m_EdgeRadius: 0
 --- !u!212 &1358574757
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2191,6 +2200,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: 2537882373423050008, guid: d69084506edbdf045a68c52e12ab93f4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -2200,7 +2210,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &1358574758
 Transform:
@@ -2386,7 +2395,7 @@ GameObject:
   - component: {fileID: 1842499832}
   - component: {fileID: 1842499831}
   - component: {fileID: 1842499833}
-  - component: {fileID: 1842499834}
+  - component: {fileID: 1842499836}
   - component: {fileID: 1842499835}
   m_Layer: 0
   m_Name: Player
@@ -2470,6 +2479,7 @@ Rigidbody2D:
   m_Constraints: 4
 --- !u!212 &1842499826
 SpriteRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2515,6 +2525,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Sprite: {fileID: -2311659948842064771, guid: fefccf15c694a1b4e8be20b6fe48851b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -2524,7 +2535,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &1842499827
 Transform:
@@ -2558,7 +2568,7 @@ MonoBehaviour:
   tr: {fileID: 1842499830}
   dashAbility: {fileID: 1842499831}
   burstAbility: {fileID: 1842499832}
-  glideAbility: {fileID: 1842499834}
+  glideAbility: {fileID: 1842499836}
   rollAbility: {fileID: 1842499835}
   moveSpeed: 10
   playerCollider: {fileID: 1842499824}
@@ -2760,7 +2770,7 @@ MonoBehaviour:
   m_Camera: {fileID: 519420031}
 --- !u!96 &1842499830
 TrailRenderer:
-  serializedVersion: 3
+  serializedVersion: 4
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2806,6 +2816,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Time: 0.5
   m_PreviewTimeScale: 1
   m_Parameters:
@@ -2873,7 +2884,6 @@ TrailRenderer:
     shadowBias: 0.5
     generateLightingData: 0
   m_MinVertexDistance: 0.1
-  m_MaskInteraction: 0
   m_Autodestruct: 0
   m_Emitting: 0
   m_ApplyActiveColorSpace: 1
@@ -2889,10 +2899,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c51a813a68cf5984ea848ebb9c52ec21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerDashAbility
+  isUnlockedField: 1
   dashingPower: 24
   dashingTime: 0.2
   dashingCooldown: 1
-  isUnlockedField: 1
 --- !u!114 &1842499832
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2905,6 +2915,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeddf33943dd32d42bcf44580e790557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerBurstAbility
+  isUnlockedField: 1
   burstForce: 20
   burstRadius: 1.5
   burstDamage: 10
@@ -2914,7 +2925,6 @@ MonoBehaviour:
     m_Bits: 0
   dashBurstMultiplier: 1.5
   maxAbilitySpeed: 25
-  isUnlockedField: 1
 --- !u!114 &1842499833
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2927,6 +2937,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc92720179702ad44914f70a0205b2e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WallJumpAbility
+  isUnlockedField: 1
   wallCheckDistance: 0.5
   wallLayer:
     serializedVersion: 2
@@ -2934,22 +2945,6 @@ MonoBehaviour:
   wallJumpForceX: 25
   wallJumpForceY: 25
   wallSlideSpeed: 2
---- !u!114 &1842499834
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1842499823}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b70f2c4577cb72543baccc9f27900cbd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerGlideAbility
-  glideGravityScale: 2
-  isUnlockedField: 1
-  glideFallSpeedMultiplier: 0.5
-  maxGlideFallSpeed: -2
 --- !u!114 &1842499835
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2962,6 +2957,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 120e791feb307cb439ef3d1ce20cbc9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerRollAbility
+  isUnlockedField: 1
   rollDuration: 0.4
   rollSpeed: 10
   rollCooldown: 0.5
@@ -2970,7 +2966,21 @@ MonoBehaviour:
   boostedJumpMultiplier: 1.5
   boostedJumpHorizontalForce: 10
   jumpBoostWindow: 0.5
+--- !u!114 &1842499836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1842499823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b70f2c4577cb72543baccc9f27900cbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerGlideAbility
   isUnlockedField: 1
+  glideGravityScale: 2
+  maxGlideFallSpeed: -2
 --- !u!1 &2118494932
 GameObject:
   m_ObjectHideFlags: 0
