@@ -3,16 +3,16 @@ using UnityEngine;
 public class MusicTrigger : MonoBehaviour
 {
     [SerializeField] private MusicProgression progressionAsset;
-    [SerializeField] private bool advanceStem = true;
+
+    private bool hasTriggered = false;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
-        {
-            if (AudioManager.Instance != null && progressionAsset != null)
-            {
-                AudioManager.Instance.StartMusicProgression(progressionAsset);
-            }
-        }
+        if (hasTriggered) return;
+        if (!other.CompareTag("Player")) return;
+        if (AudioManager.Instance == null || progressionAsset == null) return;
+
+        hasTriggered = true;
+        AudioManager.Instance.StartMusicProgression(progressionAsset);
     }
 }

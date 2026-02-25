@@ -7,6 +7,8 @@ public struct MusicStem
 {
     public float startTime;
     public float endTime;
+
+    public bool IsValid => endTime > startTime;
 }
 
 [CreateAssetMenu(fileName = "NewMusicProgression", menuName = "Audio/Variable-Time Music Progression")]
