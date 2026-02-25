@@ -61,19 +61,20 @@ public class PlayerController : MonoBehaviour, IDamageable
             return;
         }
 
+        foreach (var ability in GetComponents<PlayerAbility>())
+        {
+            ability.Initialize(this);
+        }
+
         DontDestroyOnLoad(gameObject);
     }
 
     void Start()
     {
         currentHealth = maxHealth;
-        dashAbility.Initialize(this);
-        burstAbility.Initialize(this);
-        wallJumpAbility.Initialize(this);
-        rollAbility.Initialize(this, playerCollider);
     }
 
-    public void FixedUpdate()
+    private void FixedUpdate()
     {
         if (dashAbility.IsActive || burstAbility.IsActive || rollAbility.IsActive)
         {
@@ -165,17 +166,13 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void Gravity()
     {
-        if (glideAbility != null && glideAbility.IsActive)
-        {
-            return;
-        }
-        if (wallJumpAbility.IsUnlocked && wallJumpAbility.isTouchingWall)
-        {
-            return;
-        }
+        if (glideAbility != null && glideAbility.IsActive) return;
+        if (wallJumpAbility.IsUnlocked && wallJumpAbility.isTouchingWall) return;
+
         if (rb.linearVelocity.y < 0)
         {
             rb.gravityScale = baseGravity * fallSpeedMultiplier;
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Max(rb.linearVelocity.y, -maxFallSpeed));
         }
         else
         {
@@ -202,12 +199,13 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public void Move(InputAction.CallbackContext value)
     {
-        if (DialogueManager.Instance.IsDialogueActive)
+        if (!CanAct())
         {
             horizontalMovement = 0f;
             rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
             return;
         }
+
         horizontalMovement = value.ReadValue<Vector2>().x;
         if (horizontalMovement != 0)
         {
@@ -217,7 +215,7 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public void JumpInput(InputAction.CallbackContext value)
     {
-        if (IsDead) return;
+        if (!CanAct()) return;
 
         if (rollAbility.IsActive) return;
 
@@ -253,7 +251,9 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public void DashInput(InputAction.CallbackContext value)
     {
-        if (value.performed && !IsDead)
+        if (!CanAct()) return;
+
+        if (value.performed)
         {
             dashAbility.Dash(horizontalMovement, facingDirection);
         }
@@ -261,7 +261,7 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public void BurstAction(InputAction.CallbackContext value)
     {
-        if (IsDead) return;
+        if (!CanAct()) return;
 
         burstAimInput = value.ReadValue<Vector2>();
 
@@ -281,7 +281,7 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public void GlideInput(InputAction.CallbackContext value)
     {
-        if (IsDead || !glideAbility.IsUnlocked) return;
+        if (!CanAct() || !glideAbility.IsUnlocked) return;
 
         bool isTouchingWall = wallJumpAbility.isTouchingWall;
         bool canStartGlide = !IsGrounded() && !isTouchingWall;
@@ -299,7 +299,7 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public void RollInput(InputAction.CallbackContext value)
     {
-        if (IsDead || !rollAbility.IsUnlocked) return;
+        if (!CanAct() || !rollAbility.IsUnlocked) return;
 
         if (value.performed)
         {
@@ -312,15 +312,17 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public void InteractInput(InputAction.CallbackContext value)
     {
-        if (IsDead || !value.performed) return;
+        if (!CanAct() || !value.performed) return;
 
         if (currentInteractable != null)
         {
-            if (!DialogueManager.Instance.IsDialogueActive)
-            {
-                currentInteractable.StartInteraction();
-            }
+            currentInteractable.StartInteraction();
         }
+    }
+
+    private bool CanAct()
+    {
+        return !IsDead && (DialogueManager.Instance == null || !DialogueManager.Instance.IsDialogueActive);
     }
 
     public void FlipFacingDirection()

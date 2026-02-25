@@ -3,67 +3,47 @@ using UnityEngine;
 public class NPCInteraction : MonoBehaviour
 {
     [Header("Dialogue Settings")]
-    public DialogueLine[] dialogueTree;
-
-    [Header("Interaction Settings")]
-    [SerializeField] private float interactionRange = 3f;
+    [SerializeField] private DialogueLine[] dialogueTree;
 
     private PlayerController pc;
     private bool isPlayerInRange = false;
 
-    private void Update()
-    {
-        if (pc == null) return;
-
-        bool currentlyInRange = Vector3.Distance(transform.position, pc.transform.position) <= interactionRange;
-
-        if (currentlyInRange != isPlayerInRange)
-        {
-            isPlayerInRange = currentlyInRange;
-            if (isPlayerInRange)
-            {
-                pc.currentInteractable = this;
-                Debug.Log("Player entered interaction range.");
-            }
-            else
-            {
-                if (pc.currentInteractable == this)
-                {
-                    pc.currentInteractable = null;
-                }
-                Debug.Log("Player exited interaction range.");
-            }
-        }
-    }
-
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (!other.CompareTag("Player")) return;
+
+        if (other.TryGetComponent(out PlayerController player))
         {
-            pc = other.GetComponent<PlayerController>();
+            pc = player;
+            isPlayerInRange = true;
+            pc.currentInteractable = this;
         }
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (!other.CompareTag("Player")) return;
+
+        if (pc == null) return;
+
+        if (DialogueManager.Instance != null && DialogueManager.Instance.IsDialogueActive)
         {
-            if (pc != null)
-            {
-                if (pc.currentInteractable == this)
-                {
-                    pc.currentInteractable = null;
-                }
-                pc = null;
-            }
-            isPlayerInRange = false;
+            return;
         }
+
+        if (pc.currentInteractable == this)
+        {
+            pc.currentInteractable = null;
+        }
+
+        pc = null;
+        isPlayerInRange = false;
     }
 
     public void StartInteraction()
     {
         if (!isPlayerInRange) return;
-        if (DialogueManager.Instance.IsDialogueActive) return;
+        if (DialogueManager.Instance == null || DialogueManager.Instance.IsDialogueActive) return;
 
         DialogueManager.Instance.StartDialogue(dialogueTree);
     }
@@ -71,6 +51,11 @@ public class NPCInteraction : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, interactionRange);
+
+        CircleCollider2D trigger = GetComponent<CircleCollider2D>();
+        if (trigger != null)
+        {
+            Gizmos.DrawWireSphere(transform.position, trigger.radius * transform.localScale.x);
+        }
     }
 }

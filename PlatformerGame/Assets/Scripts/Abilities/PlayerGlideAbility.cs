@@ -1,35 +1,9 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
-public class PlayerGlideAbility : MonoBehaviour
+public class PlayerGlideAbility : PlayerAbility
 {
     [SerializeField] private float glideGravityScale = 2.0f;
-    [SerializeField] private bool isUnlockedField = true;
-    [SerializeField] private float glideFallSpeedMultiplier = 0.5f;
     [SerializeField] private float maxGlideFallSpeed = -2.0f;
-    private Rigidbody2D rb;
-    private float originalGravityScale;
-    public bool IsActive { get; private set; } = false;
-
-    public bool IsUnlocked
-    {
-        get { return isUnlockedField; }
-        set { isUnlockedField = value; }
-    }
-
-    void Awake()
-    {
-        rb = GetComponent<Rigidbody2D>();
-        PlayerController pc = GetComponent<PlayerController>();
-        if (pc != null)
-        {
-            originalGravityScale = pc.baseGravity;
-        }
-        else
-        {
-            originalGravityScale = rb.gravityScale;
-        }
-    }
 
     void FixedUpdate()
     {
@@ -44,8 +18,7 @@ public class PlayerGlideAbility : MonoBehaviour
 
     public void StartGlide()
     {
-        if (!IsUnlocked) return;
-        if (IsActive) return;
+        if (!IsUnlocked || IsActive) return;
         IsActive = true;
         if (rb.linearVelocity.y < maxGlideFallSpeed)
         {
@@ -57,8 +30,7 @@ public class PlayerGlideAbility : MonoBehaviour
     public void StopGlide()
     {
         if (!IsActive) return;
-
         IsActive = false;
-        rb.gravityScale = originalGravityScale;
+        RestoreGravity();
     }
 }

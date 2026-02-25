@@ -5,8 +5,9 @@ public class Hazard : MonoBehaviour
 {
     [Header("Damage")]
     [SerializeField] private float damageAmount = 25f;
-    [SerializeField] private float damageInterval;
+    [SerializeField] private float damageInterval = 1.0f;
     private bool isPlayerInContact = false;
+    private Coroutine damageCoroutine;
 
     [Header("Collision Settings")]
     [SerializeField] private bool destroyOnHit = false;
@@ -14,15 +15,20 @@ public class Hazard : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && !isPlayerInContact)
-        {
-            isPlayerInContact = true;
-            IDamageable damageableTarget = other.GetComponent<IDamageable>();
+        if (!other.CompareTag("Player") || isPlayerInContact) return;
 
-            if (damageableTarget != null)
+        isPlayerInContact = true;
+
+        if (other.TryGetComponent(out IDamageable target))
+        {
+            if (destroyOnHit)
             {
-                StartCoroutine(RepeatingDamage(damageableTarget));
+                target.TakeDamage(damageAmount);
+                Destroy(gameObject);
+                return;
             }
+
+            damageCoroutine = StartCoroutine(RepeatingDamage(target));
         }
     }
 
@@ -30,7 +36,11 @@ public class Hazard : MonoBehaviour
     {
         if (other.CompareTag("Player") && isPlayerInContact)
         {
-            StopAllCoroutines();
+            if (damageCoroutine != null)
+            {
+                StopCoroutine(damageCoroutine);
+                damageCoroutine = null;
+            }
             isPlayerInContact = false;
         }
     }
@@ -39,6 +49,8 @@ public class Hazard : MonoBehaviour
     {
         while (isPlayerInContact)
         {
+            if (target == null || target.Equals(null)) yield break;
+
             target.TakeDamage(damageAmount);
             yield return new WaitForSeconds(damageInterval);
         }

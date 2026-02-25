@@ -10,13 +10,11 @@ public class SceneFade : MonoBehaviour
     [SerializeField] private Color fadeColor = Color.black;
     [SerializeField] private float fadeDuration = 0.5f;
 
-    private bool isFadedIn = true;
-
     private void Awake()
     {
         if (faderImage == null)
         {
-            Debug.LogError("SceneFader is missing a reference to the Fader Image component in the Inspector.");
+            Debug.LogError("SceneFade is missing a reference to the Fader Image component.");
             return;
         }
 
@@ -24,8 +22,8 @@ public class SceneFade : MonoBehaviour
 
         if (rootCanvas != null)
         {
-            GameObject canvasRoot = rootCanvas.gameObject;
-            DontDestroyOnLoad(canvasRoot);
+            rootCanvas.transform.SetParent(null);
+            DontDestroyOnLoad(rootCanvas.gameObject);
         }
     }
 
@@ -33,60 +31,48 @@ public class SceneFade : MonoBehaviour
     {
         if (faderImage != null)
         {
-            StartCoroutine(FadeOutCoroutine());
+            StartCoroutine(FadeToClear());
         }
     }
-    public IEnumerator FadeInCoroutine()
+
+    public IEnumerator FadeToBlack()
     {
         if (faderImage == null) yield break;
 
         faderImage.gameObject.SetActive(true);
         faderImage.color = new Color(fadeColor.r, fadeColor.g, fadeColor.b, 0f);
 
-        float timer = 0f;
-        while (timer < fadeDuration)
-        {
-            if (faderImage == null) yield break;
+        float elapsed = 0f;
 
-            timer += Time.deltaTime;
-            float alpha = Mathf.Lerp(0f, 1f, timer / fadeDuration);
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(0f, 1f, elapsed / fadeDuration);
             faderImage.color = new Color(fadeColor.r, fadeColor.g, fadeColor.b, alpha);
             yield return null;
         }
 
-        if (faderImage != null)
-        {
-            faderImage.color = fadeColor;
-        }
-        isFadedIn = true;
+        faderImage.color = fadeColor;
     }
-    public IEnumerator FadeOutCoroutine()
+
+    public IEnumerator FadeToClear()
     {
-        if (faderImage == null)
-        {
-            isFadedIn = false;
-            yield break;
-        }
+        if (faderImage == null) yield break;
 
         faderImage.gameObject.SetActive(true);
         faderImage.color = fadeColor;
 
-        float timer = 0f;
-        while (timer < fadeDuration)
-        {
-            if (faderImage == null) yield break;
+        float elapsed = 0f;
 
-            timer += Time.deltaTime;
-            float alpha = Mathf.Lerp(1f, 0f, timer / fadeDuration);
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, elapsed / fadeDuration);
             faderImage.color = new Color(fadeColor.r, fadeColor.g, fadeColor.b, alpha);
             yield return null;
         }
 
-        if (faderImage != null)
-        {
-            faderImage.color = new Color(fadeColor.r, fadeColor.g, fadeColor.b, 0f);
-            faderImage.gameObject.SetActive(false);
-        }
-        isFadedIn = false;
+        faderImage.color = new Color(fadeColor.r, fadeColor.g, fadeColor.b, 0f);
+        faderImage.gameObject.SetActive(false);
     }
 }

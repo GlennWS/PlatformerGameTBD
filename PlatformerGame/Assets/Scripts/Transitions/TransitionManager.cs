@@ -5,42 +5,52 @@ using UnityEngine.SceneManagement;
 public class TransitionManager : MonoBehaviour
 {
     public static TransitionManager Instance { get; private set; }
-    private string nextTransitionID = "";
+
     [SerializeField] private SceneFade sceneFade;
+
+    private string nextTransitionID = "";
+    private bool isTransitioning = false;
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            SceneManager.sceneLoaded += OnSceneLoaded;
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDestroy()
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (Instance == this)
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
     }
 
     public void LoadScene(string sceneName, string targetID)
     {
+        if (isTransitioning) return;
+
         if (sceneFade == null)
         {
             Debug.LogError("SceneFade reference is missing in TransitionManager.");
             return;
         }
-        
+
         StartCoroutine(TransitionCoroutine(sceneName, targetID));
     }
 
     private IEnumerator TransitionCoroutine(string sceneName, string targetID)
     {
-        yield return sceneFade.FadeInCoroutine();
+        isTransitioning = true;
+
+        yield return sceneFade.FadeToBlack();
+
         nextTransitionID = targetID;
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
         asyncLoad.allowSceneActivation = false;
@@ -53,42 +63,43 @@ public class TransitionManager : MonoBehaviour
         asyncLoad.allowSceneActivation = true;
 
         yield return null;
-        yield return sceneFade.FadeOutCoroutine();
+
+        yield return sceneFade.FadeToClear();
+
+        isTransitioning = false;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (string.IsNullOrEmpty(nextTransitionID)) return;
-        
+
         TransitionPoint spawnPoint = FindTransitionPoint(nextTransitionID);
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-
         CameraController cameraController = FindAnyObjectByType<CameraController>();
 
-        if (spawnPoint != null && player != null)
+        if (spawnPoint == null)
         {
-            player.transform.position = new Vector3(spawnPoint.transform.position.x + 15.0f, 
-                spawnPoint.transform.position.y, spawnPoint.transform.position.z);
+            Debug.LogError($"Spawn point with ID '{nextTransitionID}' not found.");
+            nextTransitionID = "";
+            return;
+        }
 
-            if (cameraController != null)
-            {
-                cameraController.SetTarget(player.transform);
-            }
-            else
-            {
-                Debug.LogError("CameraController not found on scene load.");
-            }
+        if (player == null)
+        {
+            Debug.LogError("Player object not found in the scene.");
+            nextTransitionID = "";
+            return;
+        }
+
+        player.transform.position = (Vector2)spawnPoint.transform.position + spawnPoint.SpawnOffset;
+
+        if (cameraController != null)
+        {
+            cameraController.SetTarget(player.transform);
         }
         else
         {
-            if (spawnPoint == null)
-            {
-                Debug.LogError($"Spawn point with ID '{nextTransitionID}' not found.");
-            }
-            if (player == null)
-            {
-                Debug.LogError("Player object not found in the scene.");
-            }
+            Debug.LogError("CameraController not found on scene load.");
         }
 
         nextTransitionID = "";
@@ -105,7 +116,7 @@ public class TransitionManager : MonoBehaviour
                 return point;
             }
         }
-        Debug.LogError($"TransitionPoint with ID '{id}' not found in the new scene!");
+
         return null;
     }
 }
