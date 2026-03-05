@@ -46,6 +46,12 @@ public class ParallaxBackground : MonoBehaviour
 
     private void Update()
     {
+        if (cam == null)
+        {
+            cam = Camera.main;
+            if (cam == null) return;
+        }
+
         float distX = cam.transform.position.x * parallaxEffectX;
         float tempX = cam.transform.position.x * (1 - parallaxEffectX);
 

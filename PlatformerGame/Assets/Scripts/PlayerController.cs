@@ -51,6 +51,10 @@ public class PlayerController : MonoBehaviour, IDamageable
     [SerializeField] private float maxFallSpeed = 18.0f;
     [SerializeField] private float fallSpeedMultiplier = 2.0f;
 
+    [Header("Animation")]
+    private Animator animator;
+
+
     private void Awake()
     {
         PlayerController[] players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
@@ -67,6 +71,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
 
         DontDestroyOnLoad(gameObject);
+        animator = GetComponent<Animator>();
     }
 
     void Start()
@@ -102,6 +107,16 @@ public class PlayerController : MonoBehaviour, IDamageable
         Vector2 currentVelocity = rb.linearVelocity;
         float targetSpeed = horizontalMovement * moveSpeed;
         float newVelocityX = currentVelocity.x;
+
+        if (animator != null)
+        {
+            animator.SetFloat("Speed", Mathf.Abs(rb.linearVelocity.x));
+            animator.SetBool("IsGrounded", IsGrounded());
+        }
+
+        Vector3 scale = transform.localScale;
+        scale.x = Mathf.Abs(scale.x) * facingDirection;
+        transform.localScale = scale;
 
         if (IsBoosted)
         {
