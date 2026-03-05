@@ -7,6 +7,11 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float smoothSpeed = 0.15f;
     [SerializeField] private Vector3 offset = new Vector3(0f, 2f, -10f);
 
+    [Header("Vertical Bounds")]
+    [SerializeField] private bool clampVertical = false;
+    [SerializeField] private float minY = -5f;
+    [SerializeField] private float maxY = 10f;
+
     private Vector3 currentVelocity;
 
     private void Awake()
@@ -32,6 +37,13 @@ public class CameraController : MonoBehaviour
             ref currentVelocity,
             smoothSpeed
         );
+
+        if (clampVertical)
+        {
+            Vector3 pos = transform.position;
+            pos.y = Mathf.Clamp(pos.y, minY, maxY);
+            transform.position = pos;
+        }
     }
 
     public void SetTarget(Transform newTarget)
