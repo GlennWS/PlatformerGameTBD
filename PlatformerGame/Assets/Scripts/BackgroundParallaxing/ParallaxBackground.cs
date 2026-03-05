@@ -1,113 +1,127 @@
 using UnityEngine;
 
+[RequireComponent(typeof(SpriteRenderer))]
 public class ParallaxBackground : MonoBehaviour
 {
-    public enum TilingMode
-    {
-        HorizontalOnly,
-        BothAxes
-    }
+    [Header("References")]
+    [SerializeField] private Camera cam;
 
-    [Header("Tiling")]
-    [SerializeField] private TilingMode tilingMode = TilingMode.BothAxes;
-
-    [Header("Parallax Settings")]
+    [Header("Parallax")]
     [Range(0f, 1f)]
-    [SerializeField] private float parallaxFactorX = 0.2f;
-
+    [SerializeField] private float parallaxEffectX = 0.5f;
     [Range(0f, 1f)]
-    [SerializeField] private float parallaxFactorY = 0.1f;
+    [SerializeField] private float parallaxEffectY = 0f;
 
-    [Header("Coverage")]
-    [SerializeField] private float coverageBuffer = 1.5f;
+    [Header("Looping")]
+    [SerializeField] private bool loopHorizontal = true;
+    [SerializeField] private bool loopVertical = false;
 
-    private Transform cam;
-    private Camera camComponent;
-    private SpriteRenderer sr;
-    private Material mat;
-    private Vector2 startPos;
-    private float textureUnitSizeX;
-    private float textureUnitSizeY;
-    private float originalSizeY;
-    private float lastOrthoSize;
+    [Header("Auto Setup")]
+    [SerializeField] private bool autoSetupChildren = true;
+
+    private float startPosX;
+    private float startPosY;
+    private float spriteWidth;
+    private float spriteHeight;
 
     private void Start()
     {
-        camComponent = Camera.main;
-        cam = camComponent.transform;
-
-        sr = GetComponent<SpriteRenderer>();
-        if (sr == null)
+        if (cam == null)
         {
-            Debug.LogError("ParallaxBackground: No SpriteRenderer found.", this);
-            enabled = false;
-            return;
+            cam = Camera.main;
         }
 
-        float ppu = sr.sprite.pixelsPerUnit;
-        textureUnitSizeX = sr.sprite.texture.width / ppu;
-        textureUnitSizeY = sr.sprite.texture.height / ppu;
-        originalSizeY = sr.size.y;
+        startPosX = transform.position.x;
+        startPosY = transform.position.y;
 
-        sr.drawMode = SpriteDrawMode.Tiled;
-        UpdateTiling();
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        spriteWidth = sr.bounds.size.x;
+        spriteHeight = sr.bounds.size.y;
 
-        mat = sr.material;
-        startPos = transform.position;
-    }
-
-    private void UpdateTiling()
-    {
-        float viewportHeight = camComponent.orthographicSize * 2f;
-        float viewportWidth = viewportHeight * camComponent.aspect;
-
-        float tilingX = Mathf.Max(Mathf.Ceil(viewportWidth / textureUnitSizeX * coverageBuffer), 2f);
-
-        if (tilingMode == TilingMode.BothAxes)
+        if (autoSetupChildren)
         {
-            float tilingY = Mathf.Max(Mathf.Ceil(viewportHeight / textureUnitSizeY * coverageBuffer), 2f);
-            sr.size = new Vector2(textureUnitSizeX * tilingX, textureUnitSizeY * tilingY);
-        }
-        else
-        {
-            sr.size = new Vector2(textureUnitSizeX * tilingX, originalSizeY);
-        }
-
-        lastOrthoSize = camComponent.orthographicSize;
-    }
-
-    private void LateUpdate()
-    {
-        if (!Mathf.Approximately(camComponent.orthographicSize, lastOrthoSize))
-        {
-            UpdateTiling();
-        }
-
-        Vector2 cameraDelta = (Vector2)cam.position - startPos;
-
-        float posX = startPos.x + cameraDelta.x * parallaxFactorX;
-        float posY = startPos.y + cameraDelta.y * parallaxFactorY;
-
-        transform.position = new Vector3(posX, posY, transform.position.z);
-
-        float offsetX = cameraDelta.x * (1f - parallaxFactorX) / textureUnitSizeX;
-
-        if (tilingMode == TilingMode.BothAxes)
-        {
-            float offsetY = cameraDelta.y * (1f - parallaxFactorY) / textureUnitSizeY;
-            mat.mainTextureOffset = new Vector2(offsetX, offsetY);
-        }
-        else
-        {
-            mat.mainTextureOffset = new Vector2(offsetX, 0f);
+            CreateDuplicates(sr);
         }
     }
 
-    private void OnDestroy()
+    private void Update()
     {
-        if (mat != null)
+        float distX = cam.transform.position.x * parallaxEffectX;
+        float tempX = cam.transform.position.x * (1 - parallaxEffectX);
+
+        transform.position = new Vector3(
+            startPosX + distX,
+            startPosY + cam.transform.position.y * parallaxEffectY,
+            transform.position.z
+        );
+
+        if (loopHorizontal)
         {
-            Destroy(mat);
+            if (tempX > startPosX + spriteWidth)
+            {
+                startPosX += spriteWidth;
+            }
+            else if (tempX < startPosX - spriteWidth)
+            {
+                startPosX -= spriteWidth;
+            }
         }
+
+        if (loopVertical)
+        {
+            float tempY = cam.transform.position.y * (1 - parallaxEffectY);
+
+            if (tempY > startPosY + spriteHeight)
+            {
+                startPosY += spriteHeight;
+            }
+            else if (tempY < startPosY - spriteHeight)
+            {
+                startPosY -= spriteHeight;
+            }
+        }
+    }
+
+    private void CreateDuplicates(SpriteRenderer sr)
+    {
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            Destroy(transform.GetChild(i).gameObject);
+        }
+
+        if (loopHorizontal)
+        {
+            CreateCopy(sr, new Vector3(-spriteWidth, 0f, 0f), "Left");
+            CreateCopy(sr, new Vector3(spriteWidth, 0f, 0f), "Right");
+        }
+
+        if (loopVertical)
+        {
+            CreateCopy(sr, new Vector3(0f, spriteHeight, 0f), "Top");
+            CreateCopy(sr, new Vector3(0f, -spriteHeight, 0f), "Bottom");
+        }
+
+        if (loopHorizontal && loopVertical)
+        {
+            CreateCopy(sr, new Vector3(-spriteWidth, spriteHeight, 0f), "TopLeft");
+            CreateCopy(sr, new Vector3(spriteWidth, spriteHeight, 0f), "TopRight");
+            CreateCopy(sr, new Vector3(-spriteWidth, -spriteHeight, 0f), "BottomLeft");
+            CreateCopy(sr, new Vector3(spriteWidth, -spriteHeight, 0f), "BottomRight");
+        }
+    }
+
+    private void CreateCopy(SpriteRenderer original, Vector3 localOffset, string suffix)
+    {
+        GameObject copy = new GameObject(original.name + "_" + suffix);
+        copy.transform.SetParent(transform, false);
+        copy.transform.localPosition = localOffset;
+
+        SpriteRenderer copySr = copy.AddComponent<SpriteRenderer>();
+        copySr.sprite = original.sprite;
+        copySr.sortingLayerID = original.sortingLayerID;
+        copySr.sortingOrder = original.sortingOrder;
+        copySr.color = original.color;
+        copySr.flipX = original.flipX;
+        copySr.flipY = original.flipY;
     }
 }
