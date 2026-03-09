@@ -2452,6 +2452,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1223546628}
   - component: {fileID: 1223546627}
+  - component: {fileID: 1223546629}
   m_Layer: 0
   m_Name: CollectibleManager
   m_TagString: Untagged
@@ -2488,6 +2489,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1223546629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1223546626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 939ea891887caee47adb7ca41a3a1b65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CollectedItemsStore
 --- !u!4 &1256081140 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4881575135531937904, guid: 9e31d0c1bf0e9af4994ec6d62799b541, type: 3}
@@ -3053,7 +3066,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 687371468}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1790558283}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -3521,7 +3534,8 @@ Transform:
   m_LocalPosition: {x: 0.13361, y: 3.48691, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1498862691}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1790558284
@@ -4717,7 +4731,6 @@ SceneRoots:
   - {fileID: 821489350}
   - {fileID: 895149483}
   - {fileID: 1223546628}
-  - {fileID: 1498862691}
   - {fileID: 1166184695}
   - {fileID: 160465649}
   - {fileID: 639014280}

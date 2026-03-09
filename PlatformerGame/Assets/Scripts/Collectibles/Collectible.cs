@@ -1,9 +1,12 @@
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class Collectible : MonoBehaviour
 {
     [Header("Value")]
     [SerializeField] private int value = 1;
+
+    [Header("ID")]
+    [SerializeField] private string overrideID = "";
 
     [Header("Hover Animation")]
     [SerializeField] private bool enableHover = true;
@@ -14,19 +17,35 @@ public class Collectible : MonoBehaviour
     [SerializeField] private float collectScaleSpeed = 8f;
     [SerializeField] private float collectRiseSpeed = 3f;
 
+    private string uniqueID;
     private Vector3 startPosition;
     private float hoverTimer;
     private bool isCollected = false;
 
     private void Start()
     {
-        startPosition = transform.position;
-        hoverTimer = Random.Range(0f, Mathf.PI * 2f);
+        uniqueID = string.IsNullOrEmpty(overrideID)
+            ? SceneManager.GetActiveScene().name + "/" + gameObject.name
+            : overrideID;
 
         if (LevelTracker.Instance != null)
         {
             LevelTracker.Instance.RegisterCollectible(value);
         }
+
+        if (CollectedItemsStore.Instance != null && CollectedItemsStore.Instance.IsCollected(uniqueID))
+        {
+            if (LevelTracker.Instance != null)
+            {
+                LevelTracker.Instance.CollectItem(value);
+            }
+
+            Destroy(gameObject);
+            return;
+        }
+
+        startPosition = transform.position;
+        hoverTimer = Random.Range(0f, Mathf.PI * 2f);
     }
 
     private void Update()
@@ -58,6 +77,11 @@ public class Collectible : MonoBehaviour
 
         isCollected = true;
         GetComponent<Collider2D>().enabled = false;
+
+        if (CollectedItemsStore.Instance != null)
+        {
+            CollectedItemsStore.Instance.MarkCollected(uniqueID);
+        }
 
         if (LevelTracker.Instance != null)
         {
